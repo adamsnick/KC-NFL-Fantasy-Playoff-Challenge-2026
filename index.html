@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fantasy Football Playoff Pool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400&display=swap" rel="stylesheet">
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -11,7 +12,7 @@
         body { 
             margin: 0; 
             padding: 0; 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
@@ -192,6 +193,7 @@
           const [submitted, setSubmitted] = useState(false);
           const [submittedRoster, setSubmittedRoster] = useState(null);
           const [participantEmail, setParticipantEmail] = useState('');
+          const [participantName, setParticipantName] = useState('');
           const [sendingEmail, setSendingEmail] = useState(false);
           const [additionalNotes, setAdditionalNotes] = useState('');
 
@@ -268,6 +270,10 @@
             let emailBody = 'FANTASY FOOTBALL PLAYOFF POOL SUBMISSION\n';
             emailBody += '='.repeat(50) + '\n\n';
             
+            if (rosterData.participantName && rosterData.participantName.trim()) {
+              emailBody += `PARTICIPANT: ${rosterData.participantName}\n\n`;
+            }
+            
             positions.forEach(pos => {
               emailBody += `${pos.name}${pos.count > 1 ? 's' : ''}:\n`;
               Array.from({ length: pos.count }, (_, i) => {
@@ -302,7 +308,7 @@
               return;
             }
 
-            const submissionData = { ...roster, participantEmail, additionalNotes };
+            const submissionData = { ...roster, participantEmail, participantName, additionalNotes };
             setSubmittedRoster(submissionData);
             setSubmitted(true);
 
@@ -310,19 +316,18 @@
             const organizerSubject = 'Fantasy Playoff Pool Submission';
             const organizerMailto = `mailto:adams.nick12@gmail.com?subject=${encodeURIComponent(organizerSubject)}&body=${encodeURIComponent(organizerEmailBody)}`;
             
+            window.location.href = organizerMailto;
+            
             if (participantEmail.trim()) {
               setSendingEmail(true);
               const participantEmailBody = formatRosterEmail(submissionData);
               const participantSubject = 'Your Fantasy Playoff Pool Roster';
               const participantMailto = `mailto:${participantEmail}?subject=${encodeURIComponent(participantSubject)}&body=${encodeURIComponent(participantEmailBody)}`;
               
-              window.open(organizerMailto);
               setTimeout(() => {
-                window.open(participantMailto);
+                window.location.href = participantMailto;
                 setSendingEmail(false);
-              }, 500);
-            } else {
-              window.open(organizerMailto);
+              }, 1000);
             }
           };
 
@@ -331,26 +336,36 @@
             setSubmittedRoster(null);
             setRoster({});
             setParticipantEmail('');
+            setParticipantName('');
             setSendingEmail(false);
             setAdditionalNotes('');
           };
 
           if (submitted && submittedRoster) {
             return (
-              <div style={{ minHeight: '100vh', padding: '24px', background: 'linear-gradient(135deg, #662B00 0%, #993F00 50%, #CC5500 100%)' }}>
+              <div style={{ minHeight: '100vh', padding: '24px', background: 'linear-gradient(135deg, #662B00 0%, #993F00 50%, #CC5500 100%)', fontFamily: 'Inter, sans-serif' }}>
                 <div style={{ maxWidth: '896px', margin: '0 auto', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)', padding: '32px' }}>
                   <div style={{ textAlign: 'center', marginBottom: '32px' }}>
                     <CheckCircle style={{ width: '64px', height: '64px', margin: '0 auto 16px', color: '#34D399' }} />
-                    <h1 style={{ fontSize: '30px', fontWeight: 'bold', marginBottom: '8px', color: '#333333' }}>Submission Successful!</h1>
+                    <h1 style={{ fontSize: '30px', fontWeight: 'bold', marginBottom: '8px', color: '#333333', fontFamily: 'Poppins, sans-serif' }}>Submission Successful!</h1>
                     <p style={{ color: '#8B95A5' }}>Your roster has been recorded. Good luck!</p>
                   </div>
 
                   <div style={{ borderRadius: '8px', padding: '24px', marginBottom: '24px', backgroundColor: '#F5F5F5' }}>
-                    <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px', color: '#333333' }}>Your Roster</h2>
+                    <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px', color: '#333333', fontFamily: 'Poppins, sans-serif' }}>Your Roster</h2>
+                    
+                    {submittedRoster.participantName && submittedRoster.participantName.trim() && (
+                      <div style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid #E6E9ED' }}>
+                        <h3 style={{ fontWeight: '600', marginBottom: '8px', color: '#5B7C99', fontFamily: 'Poppins, sans-serif' }}>Participant:</h3>
+                        <div style={{ marginLeft: '16px', color: '#8B95A5' }}>
+                          {submittedRoster.participantName}
+                        </div>
+                      </div>
+                    )}
                     
                     {positions.map(pos => (
                       <div key={pos.key} style={{ marginBottom: '16px' }}>
-                        <h3 style={{ fontWeight: '600', marginBottom: '8px', color: '#5B7C99' }}>{pos.name}s:</h3>
+                        <h3 style={{ fontWeight: '600', marginBottom: '8px', color: '#5B7C99', fontFamily: 'Poppins, sans-serif' }}>{pos.name}s:</h3>
                         <div style={{ marginLeft: '16px' }}>
                           {Array.from({ length: pos.count }, (_, i) => {
                             const slot = `${pos.key}${pos.count > 1 ? i + 1 : ''}`;
@@ -368,7 +383,7 @@
 
                     {submittedRoster.additionalNotes && submittedRoster.additionalNotes.trim() && (
                       <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #E6E9ED' }}>
-                        <h3 style={{ fontWeight: '600', marginBottom: '8px', color: '#5B7C99' }}>Additional Notes:</h3>
+                        <h3 style={{ fontWeight: '600', marginBottom: '8px', color: '#5B7C99', fontFamily: 'Poppins, sans-serif' }}>Additional Notes:</h3>
                         <div style={{ marginLeft: '16px', color: '#8B95A5', whiteSpace: 'pre-wrap' }}>
                           {submittedRoster.additionalNotes}
                         </div>
@@ -386,7 +401,7 @@
 
                   <button
                     onClick={handleReset}
-                    style={{ width: '100%', fontWeight: '600', padding: '12px', borderRadius: '8px', transition: 'background-color 0.2s', color: 'white', backgroundColor: '#CC5500', border: 'none', cursor: 'pointer' }}
+                    style={{ width: '100%', fontWeight: '600', padding: '12px', borderRadius: '8px', transition: 'background-color 0.2s', color: 'white', backgroundColor: '#CC5500', border: 'none', cursor: 'pointer', fontFamily: 'Poppins, sans-serif' }}
                     onMouseOver={(e) => e.target.style.backgroundColor = '#993F00'}
                     onMouseOut={(e) => e.target.style.backgroundColor = '#CC5500'}
                   >
@@ -400,15 +415,15 @@
           const usedTeams = getUsedTeams();
 
           return (
-            <div style={{ minHeight: '100vh', padding: '24px', background: 'linear-gradient(135deg, #662B00 0%, #993F00 50%, #CC5500 100%)' }}>
+            <div style={{ minHeight: '100vh', padding: '24px', background: 'linear-gradient(135deg, #662B00 0%, #993F00 50%, #CC5500 100%)', fontFamily: 'Inter, sans-serif' }}>
               <div style={{ maxWidth: '896px', margin: '0 auto', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)', padding: '32px' }}>
-                <h1 style={{ fontSize: '36px', fontWeight: 'bold', textAlign: 'center', marginBottom: '8px', color: '#333333' }}>
+                <h1 style={{ fontSize: '36px', fontWeight: 'bold', textAlign: 'center', marginBottom: '8px', color: '#333333', fontFamily: 'Poppins, sans-serif' }}>
                   Fantasy Football Playoff Pool
                 </h1>
                 <p style={{ textAlign: 'center', marginBottom: '32px', color: '#8B95A5' }}>Select ONE player from each playoff team</p>
 
                 <div style={{ borderRadius: '8px', padding: '16px', marginBottom: '24px', backgroundColor: '#DBE3EB', borderColor: '#5B7C99', borderWidth: '1px', borderStyle: 'solid' }}>
-                  <h3 style={{ fontWeight: '600', marginBottom: '8px', color: '#2D3E4D' }}>Rules:</h3>
+                  <h3 style={{ fontWeight: '600', marginBottom: '8px', color: '#2D3E4D', fontFamily: 'Poppins, sans-serif' }}>Rules:</h3>
                   <ul style={{ fontSize: '14px', marginLeft: '16px', color: '#445D73' }}>
                     <li style={{ marginBottom: '4px' }}>Select 1 player from each of the 14 playoff teams</li>
                     <li style={{ marginBottom: '4px' }}>All players start each week and accrue points</li>
@@ -416,7 +431,7 @@
                   </ul>
                   
                   <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #8FA5B8' }}>
-                    <p style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: '#2D3E4D' }}>If you want a player who isn't listed:</p>
+                    <p style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: '#2D3E4D', fontFamily: 'Poppins, sans-serif' }}>If you want a player who isn't listed:</p>
                     <ol style={{ fontSize: '14px', marginLeft: '16px', color: '#445D73' }}>
                       <li style={{ marginBottom: '4px' }}>Select a teammate at the same position from the list.</li>
                       <li style={{ marginBottom: '4px' }}>Write the unlisted player's name at the end of your submission.</li>
@@ -427,17 +442,30 @@
                   </div>
                   
                   <div style={{ marginTop: '16px', padding: '12px', borderRadius: '4px', backgroundColor: '#FEF3D1' }}>
-                    <p style={{ fontSize: '14px', fontWeight: '600', color: '#7E6A27' }}>⚠️ The Nando Disclaimer:</p>
+                    <p style={{ fontSize: '14px', fontWeight: '600', color: '#7E6A27', fontFamily: 'Poppins, sans-serif' }}>⚠️ The Nando Disclaimer:</p>
                     <p style={{ fontSize: '14px', marginTop: '4px', color: '#BD9F3A' }}>
                       Failure to complete the form correctly and/or in a timely manner may result in one or more of your player selections being voided, or replaced with Leonard Fournette, at the discretion of the commish. Please request a gentle confirmation if you have concerns about an invalid entry.
                     </p>
                   </div>
                 </div>
 
+                <div style={{ marginBottom: '24px', borderRadius: '8px', padding: '16px', backgroundColor: '#FFFFFF', borderColor: '#CCCCCC', borderWidth: '1px', borderStyle: 'solid' }}>
+                  <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px', color: '#333333', fontFamily: 'Poppins, sans-serif' }}>
+                    Your Name
+                  </label>
+                  <input
+                    type="text"
+                    value={participantName}
+                    onChange={(e) => setParticipantName(e.target.value)}
+                    placeholder="Enter your name"
+                    style={{ width: '100%', padding: '12px', border: '1px solid #CCCCCC', borderRadius: '8px' }}
+                  />
+                </div>
+
                 <div style={{ marginBottom: '24px', borderRadius: '8px', padding: '16px', backgroundColor: '#F5F5F5' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontWeight: '600', color: '#333333' }}>Teams Used:</span>
-                    <span style={{ fontSize: '24px', fontWeight: 'bold', color: '#333333' }}>{usedTeams.size} / 14</span>
+                    <span style={{ fontWeight: '600', color: '#333333', fontFamily: 'Poppins, sans-serif' }}>Teams Used:</span>
+                    <span style={{ fontSize: '24px', fontWeight: 'bold', color: '#333333', fontFamily: 'Poppins, sans-serif' }}>{usedTeams.size} / 14</span>
                   </div>
                   {usedTeams.size > 0 && (
                     <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
@@ -452,7 +480,7 @@
 
                 {positions.map(pos => (
                   <div key={pos.key} style={{ marginBottom: '32px' }}>
-                    <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px', color: '#333333' }}>
+                    <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px', color: '#333333', fontFamily: 'Poppins, sans-serif' }}>
                       {pos.name}{pos.count > 1 ? 's' : ''} ({pos.count})
                     </h2>
                     
@@ -464,7 +492,7 @@
                       
                       return (
                         <div key={slot} style={{ marginBottom: '16px' }}>
-                          <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px', color: '#333333' }}>
+                          <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px', color: '#333333', fontFamily: 'Poppins, sans-serif' }}>
                             {pos.name} {pos.count > 1 ? `#${i + 1}` : ''}
                           </label>
                           <select
@@ -472,62 +500,62 @@
                             onChange={(e) => handlePlayerSelect(slot, e.target.value)}
                             style={{ width: '100%', padding: '12px', border: '1px solid #CCCCCC', borderRadius: '8px' }}
                           >
-                            <option value="">-- Select {pos.name} --</option>
-                            {availablePlayers.map(({ player, team, teamName, disabled }) => (
-                              <option key={player} value={player} disabled={disabled}>
-                                {player} ({teamName}) {disabled ? '- TEAM USED' : ''}
-                              </option>
-                            ))}
-                          </select>
-                          {selectedTeam && (
-                            <p style={{ fontSize: '14px', marginTop: '4px', color: '#34D399' }}>
-                              ✓ {playoffTeams[selectedTeam]?.name}
-                            </p>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                ))}
-
-                <div style={{ marginBottom: '32px', borderRadius: '8px', padding: '16px', backgroundColor: '#DED1F2', borderColor: '#6B46C1', borderWidth: '1px', borderStyle: 'solid' }}>
-                  <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px', color: '#333333' }}>Email Confirmation (Optional)</h2>
-                  <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px', color: '#333333' }}>
-                    Your Email Address
-                  </label>
-                  <input
-                    type="email"
-                    value={participantEmail}
-                    onChange={(e) => setParticipantEmail(e.target.value)}
-                    placeholder="your.email@example.com (optional)"
-                    style={{ width: '100%', padding: '12px', border: '1px solid #CCCCCC', borderRadius: '8px' }}
-                  />
-                  <p style={{ fontSize: '14px', marginTop: '8px', color: '#503591' }}>
-                    Enter your email to receive a copy of your roster submission
-                  </p>
-                </div>
-
-                <div style={{ marginBottom: '32px', borderRadius: '8px',padding: '16px', backgroundColor: '#F5F5F5', borderColor: '#CCCCCC', borderWidth: '1px', borderStyle: 'solid' }}>
-<h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px', color: '#333333' }}>Additional Notes (Optional)</h2>
-<label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px', color: '#333333' }}>
-Player Substitutions or Special Requests
-</label>
-<textarea
-value={additionalNotes}
-onChange={(e) => setAdditionalNotes(e.target.value)}
-placeholder='Example: "Replace Jahmyr Gibbs with David Montgomery"'
-rows="4"
-style={{ width: '100%', padding: '12px', border: '1px solid #CCCCCC', borderRadius: '8px', resize: 'vertical' }}
-/>
-<p style={{ fontSize: '14px', marginTop: '8px', color: '#8B95A5' }}>
-Use this field to request unlisted players or note any substitutions
+                            <option value="">-- Select {pos.name}--</option>
+{availablePlayers.map(({ player, team, teamName, disabled }) => (
+<option key={player} value={player} disabled={disabled}>
+{player} ({teamName}) {disabled ? '- TEAM USED' : ''}
+</option>
+))}
+</select>
+{selectedTeam && (
+<p style={{ fontSize: '14px', marginTop: '4px', color: '#34D399' }}>
+✓ {playoffTeams[selectedTeam]?.name}
 </p>
+)}
 </div>
-                  {usedTeams.size !== 14 && usedTeams.size > 0 && (
+);
+})}
+</div>
+))}
+            <div style={{ marginBottom: '32px', borderRadius: '8px', padding: '16px', backgroundColor: '#DED1F2', borderColor: '#6B46C1', borderWidth: '1px', borderStyle: 'solid' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px', color: '#333333', fontFamily: 'Poppins, sans-serif' }}>Email Confirmation (Optional)</h2>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px', color: '#333333', fontFamily: 'Poppins, sans-serif' }}>
+                Your Email Address
+              </label>
+              <input
+                type="email"
+                value={participantEmail}
+                onChange={(e) => setParticipantEmail(e.target.value)}
+                placeholder="your.email@example.com (optional)"
+                style={{ width: '100%', padding: '12px', border: '1px solid #CCCCCC', borderRadius: '8px' }}
+              />
+              <p style={{ fontSize: '14px', marginTop: '8px', color: '#503591' }}>
+                Enter your email to receive a copy of your roster submission
+              </p>
+            </div>
+
+            <div style={{ marginBottom: '32px', borderRadius: '8px', padding: '16px', backgroundColor: '#F5F5F5', borderColor: '#CCCCCC', borderWidth: '1px', borderStyle: 'solid' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px', color: '#333333', fontFamily: 'Poppins, sans-serif' }}>Additional Notes (Optional)</h2>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px', color: '#333333', fontFamily: 'Poppins, sans-serif' }}>
+                Player Substitutions or Special Requests
+              </label>
+              <textarea
+                value={additionalNotes}
+                onChange={(e) => setAdditionalNotes(e.target.value)}
+                placeholder='Example: "Replace Jahmyr Gibbs with David Montgomery"'
+                rows="4"
+                style={{ width: '100%', padding: '12px', border: '1px solid #CCCCCC', borderRadius: '8px', resize: 'vertical' }}
+              />
+              <p style={{ fontSize: '14px', marginTop: '8px', color: '#8B95A5' }}>
+                Use this field to request unlisted players or note any substitutions
+              </p>
+            </div>
+
+            {usedTeams.size !== 14 && usedTeams.size > 0 && (
               <div style={{ marginBottom: '16px', borderRadius: '8px', padding: '16px', display: 'flex', alignItems: 'flex-start', gap: '12px', backgroundColor: '#FEF3D1', borderColor: '#FCD34D', borderWidth: '1px', borderStyle: 'solid' }}>
                 <AlertCircle style={{ width: '20px', height: '20px', flexShrink: 0, marginTop: '2px', color: '#7E6A27' }} />
                 <div>
-                  <p style={{ fontWeight: '600', color: '#7E6A27' }}>Warning: Team Requirement Not Met</p>
+                  <p style={{ fontWeight: '600', color: '#7E6A27', fontFamily: 'Poppins, sans-serif' }}>Warning: Team Requirement Not Met</p>
                   <p style={{ fontSize: '14px', color: '#BD9F3A' }}>
                     You must select exactly one player from each of the 14 playoff teams. 
                     Currently using {usedTeams.size} teams.
@@ -553,7 +581,8 @@ Use this field to request unlisted players or note any substitutions
                 backgroundColor: isFormComplete() ? '#CC5500' : '#CCCCCC',
                 color: isFormComplete() ? '#FFFFFF' : '#8B95A5',
                 border: 'none',
-                cursor: isFormComplete() ? 'pointer' : 'not-allowed'
+                cursor: isFormComplete() ? 'pointer' : 'not-allowed',
+                fontFamily: 'Poppins, sans-serif'
               }}
               onMouseOver={(e) => {
                 if (isFormComplete()) e.target.style.backgroundColor = '#993F00';
